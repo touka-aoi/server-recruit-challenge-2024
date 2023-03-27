@@ -1,5 +1,7 @@
 package model
 
+// アルバムスキーマの定義
+
 type AlbumID int
 
 type Album struct {

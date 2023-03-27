@@ -18,8 +18,10 @@ type singerService struct {
 	singerRepository repository.SingerRepository
 }
 
+// singerServiceがSingerServiceを実装
 var _ SingerService = (*singerService)(nil)
 
+// コンストラクタ
 func NewSingerService(singerRepository repository.SingerRepository) *singerService {
 	return &singerService{singerRepository: singerRepository}
 }

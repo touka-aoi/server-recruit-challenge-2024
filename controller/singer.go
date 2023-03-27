@@ -15,25 +15,26 @@ type singerController struct {
 	service service.SingerService
 }
 
+// コンストラクタ
 func NewSingerController(s service.SingerService) *singerController {
 	return &singerController{service: s}
 }
 
 // GET /singers のハンドラー
-func (c *singerController) GetSingerListHandler(w http.ResponseWriter, r *http.Request) {
-	singers, err := c.service.GetSingerListService(r.Context())
+func (c *singerController) GetSingerListHandler(w http.ResponseWriter, r *http.Request) { // TODO http.responseWriterってなに
+	singers, err := c.service.GetSingerListService(r.Context()) // TODO 個々のコンテキストよくわからん どこにまたがってる？
 	if err != nil {
-		errorHandler(w, r, 500, err.Error())
+		errorHandler(w, r, 500, err.Error()) // 誰？
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
-	json.NewEncoder(w).Encode(singers)
+	json.NewEncoder(w).Encode(singers) // あん？
 }
 
 // GET /singers/{id} のハンドラー
 func (c *singerController) GetSingerDetailHandler(w http.ResponseWriter, r *http.Request) {
-	singerID, err := strconv.Atoi(mux.Vars(r)["id"])
+	singerID, err := strconv.Atoi(mux.Vars(r)["id"]) // Atoiとは
 	if err != nil {
 		err = fmt.Errorf("invalid path param: %w", err)
 		errorHandler(w, r, 400, err.Error())
