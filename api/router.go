@@ -22,11 +22,12 @@ func NewRouter() *mux.Router {
 	r := mux.NewRouter()
 
 	// ルーター設定
-	r.HandleFunc("/singers", singerController.GetSingerListHandler).Methods(http.MethodGet)
+	r.HandleFunc("/singers", singerController.GetSingerListHandler).Methods(http.MethodGet) // GET /singers
 	r.HandleFunc("/singers/{id:[0-9]+}", singerController.GetSingerDetailHandler).Methods(http.MethodGet)
 	r.HandleFunc("/singers", singerController.PostSingerHandler).Methods(http.MethodPost)
 	r.HandleFunc("/singers/{id:[0-9]+}", singerController.DeleteSingerHandler).Methods(http.MethodDelete)
 
+	// ミドルウェアの設定 (ログ出力)
 	r.Use(middleware.LoggingMiddleware)
 
 	return r

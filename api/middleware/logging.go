@@ -10,10 +10,13 @@ type loggingWriter struct {
 	code int
 }
 
+// コンストラクタ
 func newLoggingWriter(w http.ResponseWriter) *loggingWriter {
+	// 初期値として500を設定
 	return &loggingWriter{ResponseWriter: w, code: http.StatusInternalServerError}
 }
 
+// ステータスコードを書き込む関数
 func (lw *loggingWriter) WriteHeader(code int) {
 	lw.code = code
 	lw.ResponseWriter.WriteHeader(code)
