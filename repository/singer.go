@@ -6,8 +6,6 @@ import (
 	"github.com/pulse227/server-recruit-challenge-sample/model"
 )
 
-// もったいない気がするな...
-
 type SingerRepository interface {
 	GetAll(ctx context.Context) ([]*model.Singer, error)
 	Get(ctx context.Context, id model.SingerID) (*model.Singer, error)

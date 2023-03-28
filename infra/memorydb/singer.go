@@ -60,6 +60,7 @@ func (r *singerRepository) Get(ctx context.Context, id model.SingerID) (*model.S
 
 // 歌手を追加する
 func (r *singerRepository) Add(ctx context.Context, singer *model.Singer) error {
+	// 書き込み時は排他制御を強く
 	r.Lock()
 	r.singerMap[singer.ID] = singer
 	r.Unlock()
@@ -68,6 +69,7 @@ func (r *singerRepository) Add(ctx context.Context, singer *model.Singer) error 
 
 // 歌手を削除する
 func (r *singerRepository) Delete(ctx context.Context, id model.SingerID) error {
+	// 削除時は排他制御を強く
 	r.Lock()
 	delete(r.singerMap, id)
 	r.Unlock()
