@@ -54,6 +54,11 @@ func (s *albumService) PostAlbumService(ctx context.Context, Album *model.Album)
 
 // DeleteAlbumService
 func (s *albumService) DeleteAlbumService(ctx context.Context, AlbumID model.AlbumID) error {
+	// 存在チェック
+	if _, err := s.albumRepository.Get(ctx, AlbumID); err != nil {
+		return err
+	}
+	// 削除
 	if err := s.albumRepository.Delete(ctx, AlbumID); err != nil {
 		return err
 	}

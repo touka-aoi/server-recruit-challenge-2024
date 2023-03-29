@@ -15,108 +15,131 @@ import (
 
 // GET /Albums のテスト
 func TestAlbumGetAll(t *testing.T) {
-	// HTTPリクエストを作成
-	req, err := http.NewRequest("GET", "/albums", nil)
-	// 作成に失敗した場合
-	if err != nil {
-		t.Fatal(err)
-	}
-	// レスポンスを用意
-	rr := httptest.NewRecorder()
-	// ルーターを作成
-	r := api.NewRouter()
-	// ルーターにリクエストを送信
-	r.ServeHTTP(rr, req)
+	t.Run("Success", func(t *testing.T) {
+		// ルーターを作成
+		r := api.NewRouter()
+		// HTTPリクエストを作成
+		req, err := http.NewRequest("GET", "/albums", nil)
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスを用意
+		rr := httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
 
-	// レスポンスのステータスコードを確認
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
-	}
+		// レスポンスのステータスコードを確認
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		}
 
-	log.Print("req: " + rr.Body.String())
+		log.Print("req: " + rr.Body.String())
 
-	expected := []*model.Album{
-		{ID: 1, Title: "Alice's 1st Album", SingerID: 1},
-		{ID: 2, Title: "Alice's 2nd Album", SingerID: 1},
-		{ID: 3, Title: "Bella's 1st Album", SingerID: 2},
-	}
+		expected := []*model.Album{
+			{ID: 1, Title: "Alice's 1st Album", SingerID: 1},
+			{ID: 2, Title: "Alice's 2nd Album", SingerID: 1},
+			{ID: 3, Title: "Bella's 1st Album", SingerID: 2},
+		}
 
-	var albums []*model.Album
-	// レスポンスのボディを確認
-	if err := json.NewDecoder(rr.Body).Decode(&albums); err != nil {
-		t.Fatal(err)
-	}
+		var albums []*model.Album
+		// レスポンスのボディを確認
+		if err := json.NewDecoder(rr.Body).Decode(&albums); err != nil {
+			t.Fatal(err)
+		}
 
-	assert.ElementsMatch(t, expected, albums)
+		assert.ElementsMatch(t, expected, albums)
+	})
 
 }
 
 // GET /albums{id} のテスト
 func TestAlbumGet(t *testing.T) {
-	// ルーターを作成
-	r := api.NewRouter()
-	// HTTPリクエストを作成
-	req, err := http.NewRequest("GET", "/albums/1", nil)
-	// 作成に失敗した場合
-	if err != nil {
-		t.Fatal(err)
-	}
-	// レスポンスを用意
-	rr := httptest.NewRecorder()
-	// ルーターにリクエストを送信
-	r.ServeHTTP(rr, req)
 
-	// レスポンスのステータスコードを確認
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
-	}
+	// IDが存在する場合
+	t.Run("ExistID", func(t *testing.T) {
+		// ルーターを作成
+		r := api.NewRouter()
+		// HTTPリクエストを作成
+		req, err := http.NewRequest("GET", "/albums/1", nil)
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスを用意
+		rr := httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
 
-	log.Print("req: " + rr.Body.String())
+		// レスポンスのステータスコードを確認
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		}
 
-	expected := &model.Album{ID: 1, Title: "Alice's 1st Album", SingerID: 1}
+		log.Print("req: " + rr.Body.String())
 
-	var albums *model.Album
-	// レスポンスのボディを確認
-	if err := json.NewDecoder(rr.Body).Decode(&albums); err != nil {
-		t.Fatal(err)
-	}
+		expected := &model.Album{ID: 1, Title: "Alice's 1st Album", SingerID: 1}
 
-	// レスポンスのボディを確認
-	assert.Equal(t, expected, albums)
+		var albums *model.Album
+		// レスポンスのボディを確認
+		if err := json.NewDecoder(rr.Body).Decode(&albums); err != nil {
+			t.Fatal(err)
+		}
 
-	// 存在しないIDの場合 500BadRequestが来る
-	// Todo: 404NotFoundが来るべき
-	req, err = http.NewRequest("GET", "/albums/1000", nil)
-	// 作成に失敗した場合
-	if err != nil {
-		t.Fatal(err)
-	}
-	// レスポンスを用意
-	rr = httptest.NewRecorder()
-	// ルーターにリクエストを送信
-	r.ServeHTTP(rr, req)
+		// レスポンスのボディを確認
+		assert.Equal(t, expected, albums)
+	})
 
-	// レスポンスのステータスコードを確認 { 500 internal server error が返ってくる }
-	if status := rr.Code; status != http.StatusInternalServerError {
-		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusBadRequest)
-	}
+	// 存在しないIDの場合
+	t.Run("NotExistID", func(t *testing.T) {
+		// ルータの作成
+		r := api.NewRouter()
 
-	// 負数の場合 404 not found が返る
-	req, err = http.NewRequest("GET", "/albums/-1", nil)
+		// HTTPリクエストを作成
+		req, err := http.NewRequest("GET", "/albums/1000", nil)
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	// 作成に失敗した場合
-	if err != nil {
-		t.Fatal(err)
-	}
-	// レスポンスを用意
-	rr = httptest.NewRecorder()
-	// ルーターにリクエストを送信
-	r.ServeHTTP(rr, req)
+		// レスポンスを用意
+		rr := httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
 
-	// レスポンスのステータスコードを確認 { 404 not foundが返ってくる }
-	if status := rr.Code; status != http.StatusNotFound {
-		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusNotFound)
-	}
+		// レスポンスのステータスコード(500)を確認
+		// Todo 404 にしたい
+		if status := rr.Code; status != http.StatusInternalServerError {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusBadRequest)
+		}
+
+		assert.Equal(t, rr.Code, 500)
+	})
+
+	// IDが負数のばあい
+	t.Run("NegativeID", func(t *testing.T) {
+		// ルーターを作成
+		r := api.NewRouter()
+		// 負数の場合 404 not found が返る
+		req, err := http.NewRequest("GET", "/albums/-1", nil)
+
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスを用意
+		rr := httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
+
+		// レスポンスのステータスコードを確認 { 404 not foundが返ってくる }
+		if status := rr.Code; status != http.StatusNotFound {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusNotFound)
+		}
+
+		assert.Equal(t, rr.Code, 404)
+
+	})
 
 }
 
@@ -501,6 +524,89 @@ func TestAlbumPost(t *testing.T) {
 		log.Print("TEST11 REQUIRE Code: ", rr.Code, " ", rr.Body.String())
 
 		assert.Equal(t, rr.Code, 400)
+
+	})
+
+}
+
+// アルバムを削除する
+// Test: /albumsN delete Test
+func TestAlbumDelete(t *testing.T) {
+
+	// 存在するアルバムIDを指定し削除する
+	t.Run("DeleteAlbum", func(t *testing.T) {
+		// ルーターを作成
+		r := api.NewRouter()
+
+		// HTTPリクエストを作成
+		req, err := http.NewRequest("DELETE", "/albums/1", nil)
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスを用意
+		rr := httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
+
+		// レスポンスのステータスコードを確認
+		if status := rr.Code; status != http.StatusNoContent {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusNoContent)
+		}
+
+		log.Print("TEST1 削除完了: " + rr.Body.String())
+
+		assert.Equal(t, rr.Code, 204)
+
+		// 削除したアルバムを取得し、500が返ってくることを確認
+		req, err = http.NewRequest("GET", "/albums/1", nil)
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスを用意
+		rr = httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
+
+		// レスポンスのステータスコードを確認
+		if status := rr.Code; status != http.StatusInternalServerError {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusInternalServerError)
+		}
+
+		log.Print("TEST1 削除後の取得: " + rr.Body.String())
+
+		assert.Equal(t, rr.Code, 500)
+
+		// t.Fatal()
+	})
+
+	// 存在しないアルバムIDを指定し削除する
+	t.Run("DeleteAlbumNotExist", func(t *testing.T) {
+		// ルーターを作成
+		r := api.NewRouter()
+
+		// HTTPリクエストを作成
+		req, err := http.NewRequest("DELETE", "/albums/999", nil)
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスを用意
+		rr := httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
+
+		// レスポンスのステータスコード (500) を確認
+		if status := rr.Code; status != http.StatusInternalServerError {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusInternalServerError)
+		}
+
+		log.Print("TEST2 削除失敗: " + rr.Body.String())
+
+		assert.Equal(t, rr.Code, 500)
+
+		// t.Fatal()
 
 	})
 
