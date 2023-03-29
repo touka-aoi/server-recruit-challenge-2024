@@ -57,22 +57,17 @@ func (r *albumRepository) Get(ctx context.Context, id model.AlbumID) (*model.Alb
 }
 
 func (r *albumRepository) Add(ctx context.Context, album *model.Album) error {
+	r.Lock()
+	defer r.Unlock()
+	// 追加
+	r.albumMap[album.ID] = album
 	return nil
 }
 
 func (r *albumRepository) Delete(ctx context.Context, id model.AlbumID) error {
+	r.Lock()
+	defer r.Unlock()
+	// 削除
+	delete(r.albumMap, id)
 	return nil
 }
-
-// アルバムを追加する
-// func (r *albumRepository) Add(ctx context.Context, album *model.Album) error {
-// 	r.Lock()
-// 	defer r.Unlock()
-// 	// SingerIDが存在するかチェックする
-// 	_, ok := r.albumMap[model.AlbumID(album.SingerID)]
-// 	if !ok {
-// 		return errors.New("not found")
-// 	}
-
-// 	return
-// }

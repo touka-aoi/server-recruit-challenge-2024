@@ -63,8 +63,16 @@ func (c *albumController) PostAlbumHandler(w http.ResponseWriter, r *http.Reques
 
 	// リクエストのパース
 	if err := json.NewDecoder(r.Body).Decode(&album); err != nil {
-		// エラー処理
+		// パース時のエラー処理
 		err = fmt.Errorf("invalid request body: %w", err)
+		errorHandler(w, r, 400, err.Error())
+		return
+	}
+
+	// リクエストのバリデーション
+	validation := &AlbumsValidation{}
+
+	if err := validation.ValidateAlbum(album); err != nil {
 		errorHandler(w, r, 400, err.Error())
 		return
 	}
