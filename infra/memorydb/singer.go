@@ -15,20 +15,24 @@ type singerRepository struct {
 }
 
 var _ repository.SingerRepository = (*singerRepository)(nil)
+var singerRepo *singerRepository
 
 // 初期データを作成する関数
 func NewSingerRepository() *singerRepository {
-	var initMap = map[model.SingerID]*model.Singer{
-		1: {ID: 1, Name: "Alice"},
-		2: {ID: 2, Name: "Bella"},
-		3: {ID: 3, Name: "Chris"},
-		4: {ID: 4, Name: "Daisy"},
-		5: {ID: 5, Name: "Ellen"},
+	// すでに初期データが作成されている場合はそれを返すs
+	if singerRepo == nil {
+		var initMap = map[model.SingerID]*model.Singer{
+			1: {ID: 1, Name: "Alice"},
+			2: {ID: 2, Name: "Bella"},
+			3: {ID: 3, Name: "Chris"},
+			4: {ID: 4, Name: "Daisy"},
+			5: {ID: 5, Name: "Ellen"},
+		}
+		return &singerRepository{
+			singerMap: initMap,
+		}
 	}
-
-	return &singerRepository{
-		singerMap: initMap,
-	}
+	return singerRepo
 }
 
 // すべての歌手を取得する

@@ -15,17 +15,21 @@ type albumRepository struct {
 }
 
 var _ repository.AlbumRepository = (*albumRepository)(nil)
+var albumRepo *albumRepository
 
 func NewAlbumRepository() *albumRepository {
-	var initMap = map[model.AlbumID]*model.Album{
-		1: {ID: 1, Title: "Alice's 1st Album", SingerID: 1},
-		2: {ID: 2, Title: "Alice's 2nd Album", SingerID: 1},
-		3: {ID: 3, Title: "Bella's 1st Album", SingerID: 2},
+	// 初期化されていない場合は初期化する
+	if albumRepo == nil {
+		var initMap = map[model.AlbumID]*model.Album{
+			1: {ID: 1, Title: "Alice's 1st Album", SingerID: 1},
+			2: {ID: 2, Title: "Alice's 2nd Album", SingerID: 1},
+			3: {ID: 3, Title: "Bella's 1st Album", SingerID: 2},
+		}
+		return &albumRepository{
+			albumMap: initMap,
+		}
 	}
-
-	return &albumRepository{
-		albumMap: initMap,
-	}
+	return albumRepo
 }
 
 // すべてのアルバムを取得する
