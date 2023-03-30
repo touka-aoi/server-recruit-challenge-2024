@@ -35,7 +35,7 @@ ErrorContorller <-- SingerController
 
 ErrorContorller <-- AlbumsController
 
-%% Albumsservice <-- AlbumsController
+Albumsservice <-- AlbumsController
 AlbumsRepository <-- Albumsservice
 AlbumsModel <-- Albumsservice
 AlbumsModel <-- AlbumsRepository
@@ -45,12 +45,13 @@ AlbumsRepository <|.. AlbumsMemory
 AlbumsSingerProxy <-- AlbumsController
 AlbumsRepository <|.. AlbumsSingerProxy 
 AlbumsModel <-- AlbumsSingerProxy
-Albumsservice <-- AlbumsSingerProxy
-Singerservice <-- AlbumsSingerProxy
+AlbumsMemory <-- AlbumsSingerProxy
+SingerMemory <-- AlbumsSingerProxy
 
 logging <-- Router
 SingerMemory <-- Router
-AlbumsMemory <-- Router
+%% AlbumsMemory <-- Router
+AlbumsSingerProxy <-- Router
 SingerController <-- Router
 AlbumsController <-- Router
 Router <-- main
