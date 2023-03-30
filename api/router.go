@@ -24,11 +24,13 @@ func NewRouter() *mux.Router {
 	albumRepo := memorydb.NewAlbumRepository()
 	// アルバムサービスの作成
 	albumService := service.NewAlbumService(albumRepo)
-	// アルバムコントローラの作成
+	// アルバムコントローラの作成 (課題3の場合はこっち)
 	// albumController := controller.NewAlbumController(albumService)
 
 	// アルバム + 歌手情報
 	albumSingerService := service.NewAlbumSingerService(albumService, singerService)
+	// アルバムコントローラの作成
+	// (課題4の場合はこっち)
 	albumController := controller.NewAlbumSingerController(albumSingerService)
 
 	// ルータの作成
