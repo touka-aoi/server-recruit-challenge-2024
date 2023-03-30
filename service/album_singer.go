@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/pulse227/server-recruit-challenge-sample/model"
-	"github.com/pulse227/server-recruit-challenge-sample/repository"
 )
 
 type AlbumSingerService interface {
@@ -15,22 +14,22 @@ type AlbumSingerService interface {
 }
 
 type albumSingerService struct {
-	albumRepository  repository.AlbumRepository
-	singerRepository repository.SingerRepository
+	albumSvc  albumService
+	singerSvc singerService
 }
 
 var _ AlbumSingerService = (*albumSingerService)(nil)
 
-func NewAlbumSingerService(albumRepository repository.AlbumRepository, singerRepository repository.SingerRepository) AlbumSingerService {
+func NewAlbumSingerService(albumSvc *albumService, singerSvc *singerService) *albumSingerService {
 	return &albumSingerService{
-		albumRepository:  albumRepository,
-		singerRepository: singerRepository,
+		albumSvc:  *albumSvc,
+		singerSvc: *singerSvc,
 	}
 }
 
 func (s *albumSingerService) GetAlbumSingerListService(ctx context.Context) ([]*model.AlbumSinger, error) {
 	// アルバムデータの取得
-	albums, err := s.albumRepository.GetAll(ctx)
+	albums, err := s.albumSvc.GetAlbumListService(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +39,7 @@ func (s *albumSingerService) GetAlbumSingerListService(ctx context.Context) ([]*
 
 	// 歌手データの取得
 	for _, album := range albums {
-		singer, err := s.singerRepository.Get(ctx, album.SingerID)
+		singer, err := s.singerSvc.GetSingerService(ctx, album.SingerID)
 		if err != nil {
 			return nil, err
 		}
@@ -57,27 +56,39 @@ func (s *albumSingerService) GetAlbumSingerListService(ctx context.Context) ([]*
 }
 
 func (s *albumSingerService) GetAlbumSingerService(ctx context.Context, AlbumID model.AlbumID) (*model.AlbumSinger, error) {
-	album, err := s.albumRepository.Get(ctx, AlbumID)
+	// アルバムデータの取得
+	album, err := s.albumSvc.GetAlbumService(ctx, AlbumID)
 	if err != nil {
 		return nil, err
 	}
 
-	singer, err := s.singerRepository.Get(ctx, album.SingerID)
+	// 歌手データの取得
+	singer, err := s.singerSvc.GetSingerService(ctx, album.SingerID)
 	if err != nil {
 		return nil, err
 	}
 
+	// アルバムと歌手のデータを結合
 	return &model.AlbumSinger{
 		ID:     album.ID,
 		Title:  album.Title,
 		Singer: *singer,
 	}, nil
+
 }
 
 func (s *albumSingerService) PostAlbumSingerService(ctx context.Context, Album *model.Album) error {
+	// アルバムデータの登録
+	if err := s.albumSvc.PostAlbumService(ctx, Album); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (s *albumSingerService) DeleteAlbumSingerService(ctx context.Context, AlbumID model.AlbumID) error {
+	// アルバムデータの削除
+	if err := s.albumSvc.DeleteAlbumService(ctx, AlbumID); err != nil {
+		return err
+	}
 	return nil
 }
