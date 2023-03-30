@@ -65,7 +65,4 @@ Router <-- main
 %% AlbumsModel <-- AlbumsSingerservice
 %% AlbumsSingerservice <-- AlbumsController
 
-
-
-
 ```
