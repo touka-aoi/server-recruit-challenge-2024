@@ -469,6 +469,8 @@ func TestAlbumSingerPost(t *testing.T) {
 
 	})
 
+	// t.Fatal()
+
 }
 
 // アルバムを削除する
@@ -552,4 +554,66 @@ func TestAlbumSingerDelete(t *testing.T) {
 
 	})
 
+}
+
+// 特殊テスト
+func TestSpecialCase(t *testing.T) {
+	// 存在しないsingerIDが一つ含まれていた場合エラーが起きることを確認
+	t.Run("SpecialCase", func(t *testing.T) {
+		// ルーターを作成
+		r := api.NewRouter()
+
+		// リクエストを作成
+		parm := `{"id": 10, "title":"Alice's 3rd Album","singer_id":999}`
+		// JSON文字列をバイトスライスに変換
+		body := []byte(parm)
+		// io.Reader型のオブジェクトを作成
+		requestBody := bytes.NewBuffer(body)
+
+		// HTTPリクエストを作成
+		req, err := http.NewRequest("POST", "/albums", requestBody)
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスを用意
+		rr := httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
+
+		// レスポンスのステータスコード(200)を確認
+		if status := rr.Code; status != http.StatusOK {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		}
+
+		expected := &model.Album{ID: 10, Title: "Alice's 3rd Album", SingerID: 999}
+
+		var albums *model.Album
+		// レスポンスのボディを確認
+		if err := json.NewDecoder(rr.Body).Decode(&albums); err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスのボディを確認
+		assert.Equal(t, expected, albums)
+
+		// レスポンスのボディを確認
+		log.Print("TEST1 正常POST: " + rr.Body.String())
+
+		// すべてのアルバムデータを取得する
+		req, err = http.NewRequest("GET", "/albums", nil)
+		// 作成に失敗した場合
+		if err != nil {
+			t.Fatal(err)
+		}
+		// レスポンスを用意
+		rr = httptest.NewRecorder()
+		// ルーターにリクエストを送信
+		r.ServeHTTP(rr, req)
+
+		// レスポンスのステータスコード(200)を確認
+		if status := rr.Code; status != http.StatusInternalServerError {
+			t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusInternalServerError)
+		}
+
+	})
 }
