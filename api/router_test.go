@@ -1,5 +1,11 @@
 package api_test
 
+// album単体用のテスト
+// albumコントローラを有効にしてテストを行う
+// albumController := controller.NewAlbumController(albumService)
+
+/**
+
 import (
 	"bytes"
 	"encoding/json"
@@ -611,3 +617,4 @@ func TestAlbumDelete(t *testing.T) {
 	})
 
 }
+**/
