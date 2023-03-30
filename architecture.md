@@ -17,6 +17,9 @@ class AlbumsController
 <<interface>> AlbumsRepository
 <<Entity>> AlbumsModel
 
+class AlbumsSingerModel
+<<Entity>> AlbumsSingerModel
+
 class AlbumsSingerProxy
 
 class Router
@@ -42,11 +45,10 @@ AlbumsModel <-- AlbumsRepository
 AlbumsModel <-- AlbumsMemory
 AlbumsRepository <|.. AlbumsMemory
 
-AlbumsSingerProxy <-- AlbumsController
-AlbumsRepository <|.. AlbumsSingerProxy 
-AlbumsModel <-- AlbumsSingerProxy
-AlbumsMemory <-- AlbumsSingerProxy
-SingerMemory <-- AlbumsSingerProxy
+AlbumsSingerModel <-- AlbumsSingerService
+AlbumsSingerService <-- AlbumsSingerController
+ErrorContorller <-- AlbumsSingerController
+AlbumsSingerController <-- Router
 
 logging <-- Router
 SingerMemory <-- Router
