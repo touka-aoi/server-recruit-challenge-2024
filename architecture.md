@@ -9,6 +9,7 @@ class SingerController
 <<interface>> SingerRepository
 <<Entity>> SingerModel
 
+class validation_album
 class Albumsservice
 class AlbumsRepository
 class AlbumsModel
@@ -19,8 +20,6 @@ class AlbumsController
 
 class AlbumsSingerModel
 <<Entity>> AlbumsSingerModel
-
-class AlbumsSingerProxy
 
 class Router
 class logging
@@ -40,11 +39,16 @@ ErrorContorller <-- AlbumsController
 
 Albumsservice <-- AlbumsController
 AlbumsRepository <-- Albumsservice
+AlbumsModel <-- validation_album
+validation_album <-- Albumsservice
 AlbumsModel <-- Albumsservice
 AlbumsModel <-- AlbumsRepository
 AlbumsModel <-- AlbumsMemory
 AlbumsRepository <|.. AlbumsMemory
 
+
+Albumsservice <-- AlbumsSingerService
+Singerservice <-- AlbumsSingerService
 AlbumsSingerModel <-- AlbumsSingerService
 AlbumsSingerService <-- AlbumsSingerController
 ErrorContorller <-- AlbumsSingerController
@@ -52,8 +56,7 @@ AlbumsSingerController <-- Router
 
 logging <-- Router
 SingerMemory <-- Router
-%% AlbumsMemory <-- Router
-AlbumsSingerProxy <-- Router
+AlbumsMemory <-- Router
 SingerController <-- Router
 AlbumsController <-- Router
 Router <-- main
